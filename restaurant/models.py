@@ -20,11 +20,11 @@ class Restaurant(models.Model):
     updated_at = models.DateTimeField("수정일자", auto_now=True)
 
 
-class AccountBookRecord(models.Model):
+class RestaurantRecord(models.Model):
     """
     Assignee : 상백
 
-    Restaurant 모델과 1:N 관계를 가지는 AccountBookRecord 모델입니다.
+    Restaurant 모델과 1:N 관계를 가지는 RestaurantRecord 모델입니다.
     하나의 Restaurant에 특정 날짜에 속하는 금액 및 메모를 기록할 수 있도록 설정합니다.
     또한, 삭제가 진행되는 경우 is_deleted 필드를 True로 변경합니다.
     """
