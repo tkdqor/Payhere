@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from config.permissions import IsOwner
 from restaurant.models import Restaurant
 
-from .serializers import RestaurantModelSerializer, RestaurantRecordModelSerializer
+from .serializers import RestaurantModelSerializer, RestaurantRecordListModelSerializer, RestaurantRecordModelSerializer
 
 
 # url : GET, POST api/v1/restaurants
@@ -97,13 +97,14 @@ class RestaurantDetailAPIView(APIView):
         return Response(RestaurantModelSerializer(restaurant).data, status=status.HTTP_200_OK)
 
 
-# url : POST api/v1/restaurants/<restaurant_id>/records
+# url : GET, POST api/v1/restaurants/<restaurant_id>/records
 class RestaurantRecordAPIView(APIView):
     """
     Assignee : 상백
 
     permission = 작성자 본인만 가능
-    Http method = POST
+    Http method = GET, POST
+    GET : 특정 가계부에 속하는 레코드 조회
     POST : 특정 가계부에 속하는 레코드 생성
     """
 
@@ -124,6 +125,22 @@ class RestaurantRecordAPIView(APIView):
 
         self.check_object_permissions(self.request, object)
         return object
+
+    def get(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        특정 가계부에 속하는 레코드(금액, 메모)들을 조회할 수 있게 해주는 메서드입니다.
+        RestaurantRecordListModelSerializer를 이용해서 특정 가계부의 속한 레코드들을 보여주고
+        초기 잔액과 현재 잔액을 파악할 수 있습니다.
+        """
+
+        restaurant = self.get_object_and_check_permission(restaurant_id)
+        if not restaurant:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(RestaurantRecordListModelSerializer(restaurant).data, status=status.HTTP_200_OK)
 
     def post(self, request, restaurant_id):
         """
