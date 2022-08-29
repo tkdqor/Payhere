@@ -31,7 +31,10 @@ class RestaurantAPIView(APIView):
 
         restaurants = Restaurant.objects.filter(user=request.user, is_deleted=False).order_by("-created_at")
         serializer = RestaurantModelSerializer(restaurants, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if restaurants:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "해당 유저가 생성한 가계부가 없습니다. 가계부를 생성해주세요!"}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
         """
@@ -48,3 +51,46 @@ class RestaurantAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# url : GET api/v1/restaurants/<restaurant_id>
+class RestaurantDetailAPIView(APIView):
+    """
+    Assignee : 상백
+
+    permission = 작성자 본인만 가능
+    Http method = GET
+    GET : 특정 가계부 조회
+    """
+
+    permission_classes = [IsOwner]
+
+    def get_object_and_check_permission(self, obj_id):
+        """
+        Assignee : 상백
+
+        restaurant_id로 들어온 id에 해당하는 객체가 있는지 검토하는 메서드입니다.
+        존재하지 않아 DoesNotExist 에러가 발생할 경우 None을 리턴합니다.
+        """
+        try:
+            object = Restaurant.objects.get(id=obj_id)
+        except Restaurant.DoesNotExist:
+            return None
+
+        self.check_object_permissions(self.request, object)
+        return object
+
+    def get(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        특정 가계부 조회를 하기 위한 메서드입니다. 가계부 목록 조회에서 볼 수 있는 가계부 고유번호가 필요합니다.
+        restaurant_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
+        """
+
+        restaurant = self.get_object_and_check_permission(restaurant_id)
+        if not restaurant:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(RestaurantModelSerializer(restaurant).data, status=status.HTTP_200_OK)
