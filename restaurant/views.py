@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from config.permissions import IsOwner
 from restaurant.models import Restaurant
 
-from .serializers import RestaurantModelSerializer
+from .serializers import RestaurantModelSerializer, RestaurantRecordModelSerializer
 
 
 # url : GET, POST api/v1/restaurants
@@ -72,6 +72,7 @@ class RestaurantDetailAPIView(APIView):
         restaurant_id로 들어온 id에 해당하는 객체가 있는지 검토하는 메서드입니다.
         존재하지 않아 DoesNotExist 에러가 발생할 경우 None을 리턴합니다.
         """
+
         try:
             object = Restaurant.objects.get(id=obj_id)
         except Restaurant.DoesNotExist:
@@ -94,3 +95,54 @@ class RestaurantDetailAPIView(APIView):
                 {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
             )
         return Response(RestaurantModelSerializer(restaurant).data, status=status.HTTP_200_OK)
+
+
+# url : POST api/v1/restaurants/<restaurant_id>/records
+class RestaurantRecordAPIView(APIView):
+    """
+    Assignee : 상백
+
+    permission = 작성자 본인만 가능
+    Http method = POST
+    POST : 특정 가계부에 속하는 레코드 생성
+    """
+
+    permission_classes = [IsOwner]
+
+    def get_object_and_check_permission(self, obj_id):
+        """
+        Assignee : 상백
+
+        restaurant_id로 들어온 id에 해당하는 객체가 있는지 검토하는 메서드입니다.
+        존재하지 않아 DoesNotExist 에러가 발생할 경우 None을 리턴합니다.
+        """
+
+        try:
+            object = Restaurant.objects.get(id=obj_id)
+        except Restaurant.DoesNotExist:
+            return None
+
+        self.check_object_permissions(self.request, object)
+        return object
+
+    def post(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        클라이언트가 POST 요청을 하고 가계부 고유번호를 입력하면, 해당 가계부에 속한 금액과 메모 레코드를 생성하는 메서드입니다.
+        context 딕셔너리로 Restaurant 객체를 보내서 클라이언트가 가계부 고유번호 id를 입력하지 않게 설정했습니다.
+        ex) {"amount": "20000","memo": "카드매출"}
+        """
+
+        restaurant = self.get_object_and_check_permission(restaurant_id)
+        if not restaurant:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        else:
+            context = {"restaurant": restaurant}
+            serializer = RestaurantRecordModelSerializer(data=request.data, context=context)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
