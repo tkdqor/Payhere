@@ -3,21 +3,35 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.permissions import IsOwner
+from restaurant.models import Restaurant
 
 from .serializers import RestaurantModelSerializer
 
 
-# url : POST api/v1/restaurants
+# url : GET, POST api/v1/restaurants
 class RestaurantAPIView(APIView):
     """
     Assignee : 상백
 
     permission = 작성자 본인만 가능
-    Http method = POST
+    Http method = GET, POST
+    GET : 가계부 목록 조회
     POST : 가계부 생성
     """
 
     permission_classes = [IsOwner]
+
+    def get(self, request):
+        """
+        Assignee : 상백
+
+        가계부 목록을 조회할 수 있게 가계부 정보들을 response 하는 메서드입니다.
+        로그인된 유저가 생성한 가계부 목록에서 삭제 되지 않은 목록만 보여줍니다.
+        """
+
+        restaurants = Restaurant.objects.filter(user=request.user, is_deleted=False).order_by("-created_at")
+        serializer = RestaurantModelSerializer(restaurants, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         """
