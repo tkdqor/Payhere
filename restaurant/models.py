@@ -32,7 +32,7 @@ class RestaurantRecord(models.Model):
     restaurant = models.ForeignKey(
         to=Restaurant, verbose_name="식당", on_delete=models.CASCADE, related_name="restaurant_record"
     )
-    data = models.DateField("날짜")
+    date = models.DateField("날짜", auto_now_add=True)
     amount = models.IntegerField("금액", default=0)
     memo = models.CharField("메모", max_length=200)
     is_deleted = models.BooleanField("삭제 여부", default=False)

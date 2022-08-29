@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
 
-from .models import Restaurant
+from .models import Restaurant, RestaurantRecord
 
 
 class RestaurantModelSerializer(ModelSerializer):
@@ -24,3 +24,22 @@ class RestaurantModelSerializer(ModelSerializer):
         model = Restaurant
         fields = ("name", "가계부_고유번호", "user", "balance", "is_deleted", "created_at", "updated_at")
         read_only_fields = ["user", "is_deleted", "created_at", "updated_at"]
+
+
+class RestaurantRecordModelSerializer(ModelSerializer):
+    """
+    Assignee : 상백
+
+    create 메소드를 통해 특정 Restaurant 모델 객체와 1:N관계가 형성된 RestaurantRecord 모델 객체를 생성합니다.
+    """
+
+    def create(self, validated_data):
+        restaurant = self.context["restaurant"]
+        restaurant_record = RestaurantRecord(restaurant=restaurant, **validated_data)
+        restaurant_record.save()
+        return restaurant_record
+
+    class Meta:
+        model = RestaurantRecord
+        fields = ("restaurant", "date", "amount", "memo", "is_deleted", "created_at", "updated_at")
+        read_only_fields = ["restaurant", "date", "is_deleted", "created_at", "updated_at"]
