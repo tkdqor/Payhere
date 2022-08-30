@@ -54,6 +54,8 @@ class RestaurantRecordModelSerializer(ModelSerializer):
     create 메소드를 통해 특정 Restaurant 모델 객체와 1:N관계가 형성된 RestaurantRecord 모델 객체를 생성합니다.
     """
 
+    가계부_고유번호 = serializers.IntegerField(source="restaurant_id", required=False, read_only=True)
+    레코드_고유번호 = serializers.IntegerField(source="id", required=False, read_only=True)
     balance = serializers.SerializerMethodField(required=False, read_only=True)
 
     def get_balance(self, obj):
@@ -71,8 +73,8 @@ class RestaurantRecordModelSerializer(ModelSerializer):
 
     class Meta:
         model = RestaurantRecord
-        fields = ("restaurant", "date", "amount", "balance", "memo", "is_deleted", "created_at", "updated_at")
-        read_only_fields = ["restaurant", "date", "balance", "is_deleted", "created_at", "updated_at"]
+        fields = ("가계부_고유번호", "레코드_고유번호", "date", "amount", "balance", "memo", "is_deleted", "created_at", "updated_at")
+        read_only_fields = ["가계부_고유번호", "레코드_고유번호", "date", "balance", "is_deleted", "created_at", "updated_at"]
 
 
 class RestaurantRecordListModelSerializer(ModelSerializer):
