@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from config.permissions import IsOwner
-from restaurant.models import Restaurant
+from restaurant.models import Restaurant, RestaurantRecord
 
 from .serializers import RestaurantModelSerializer, RestaurantRecordListModelSerializer, RestaurantRecordModelSerializer
 
@@ -163,3 +163,36 @@ class RestaurantRecordAPIView(APIView):
                 serializer.save()
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# url : GET api/v1/restaurants/<restaurant_id>/records/<record_id>
+class RestaurantRecordDetailAPIView(APIView):
+    """
+    Assignee : 상백
+
+    permission = 작성자 본인만 가능 - GET 메소드 내부에 예외처리로 진행
+    Http method = GET
+    GET : 특정 가계부에 속하는 특정 단일 레코드 조회
+    """
+
+    permission_classes = [IsOwner]
+
+    def get(self, request, restaurant_id, record_id):
+        """
+        Assignee : 상백
+
+        특정 가계부에 속하는 특정 레코드를 조회를 하기 위한 메서드입니다.
+        가계부 목록 조회에서 볼 수 있는 가계부 고유번호와 특정 가계부에 속하는 레코드 조회에서 볼 수 있는 레코드_고유번호가 필요합니다.
+        restaurant_id로 존재하는 객체 또는 record_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
+        """
+
+        try:
+            restaurant = Restaurant.objects.get(user=request.user, id=restaurant_id)
+            restaurant_record = RestaurantRecord.objects.get(restaurant=restaurant, id=record_id)
+            return Response(RestaurantRecordModelSerializer(restaurant_record).data, status=status.HTTP_200_OK)
+        except Restaurant.DoesNotExist:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except RestaurantRecord.DoesNotExist:
+            return Response({"error": "해당 record_id로 존재하는 레코드가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND)
