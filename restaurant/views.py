@@ -53,15 +53,16 @@ class RestaurantAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# url : GET,PUT api/v1/restaurants/<restaurant_id>
+# url : GET,PUT,PATCH api/v1/restaurants/<restaurant_id>
 class RestaurantDetailAPIView(APIView):
     """
     Assignee : 상백
 
     permission = 작성자 본인만 가능
-    Http method = GET, PUT
+    Http method = GET, PUT, PATCH
     GET : 특정 가계부 조회
     PUT : 특정 가계부 수정
+    PATCH : 특정 가계부 삭제 및 복구
     """
 
     permission_classes = [IsOwner]
@@ -119,6 +120,34 @@ class RestaurantDetailAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"message": "해당 가계부 정보가 수정되었습니다."}, status=status.HTTP_200_OK)
+
+    def patch(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        특정 가계부를 삭제 및 복구하기 위한 메서드입니다. 가계부 목록 조회에서 볼 수 있는 가계부 고유번호가 필요합니다.
+        restaurant_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
+        is_deleted 필드를 true로 설정 후 JSON 형태로 요청하면 삭제 처리가 되고, false로 설정 후 JSON 형태로 요청하면 복구가 됩니다.
+        ex) {"is_deleted": true} 또는 {"is_deleted": false}
+        """
+
+        if request.data.get("name", None) or request.data.get("balance", None) is not None:
+            return Response({"error": "변경할 수 없는 정보입니다. is_deleted만 수정이 가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            restaurant = Restaurant.objects.get(user=request.user, id=restaurant_id)
+            if request.data["is_deleted"] == True:
+                restaurant.is_deleted = True
+                restaurant.save()
+                return Response({"message": "해당 가계부를 삭제했습니다!"}, status=status.HTTP_200_OK)
+            elif request.data["is_deleted"] == False:
+                restaurant.is_deleted = False
+                restaurant.save()
+                return Response({"message": "해당 가계부를 복구했습니다!"}, status=status.HTTP_200_OK)
+        except Restaurant.DoesNotExist:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 # url : GET, POST api/v1/restaurants/<restaurant_id>/records
@@ -198,7 +227,7 @@ class RestaurantRecordDetailAPIView(APIView):
     Http method = GET, PUT, PATCH
     GET : 특정 가계부에 속하는 특정 레코드 조회
     PUT : 특정 가계부에 속하는 특정 레코드 수정
-    PATCH : 특정 가계부에 속하는 특정 레코드 삭제
+    PATCH : 특정 가계부에 속하는 특정 레코드 삭제 및 복구
     """
 
     permission_classes = [IsOwner]
@@ -255,7 +284,7 @@ class RestaurantRecordDetailAPIView(APIView):
         """
         Assignee : 상백
 
-        특정 가계부에 속하는 특정 레코드를 삭제하기 위한 메서드입니다.
+        특정 가계부에 속하는 특정 레코드를 삭제 및 복구하기 위한 메서드입니다.
         가계부 목록 조회에서 볼 수 있는 가계부 고유번호와 특정 가계부에 속하는 레코드 조회에서 볼 수 있는 레코드 고유번호가 필요합니다.
         restaurant_id로 존재하는 객체 또는 record_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
         is_deleted 필드를 true로 설정 후 JSON 형태로 요청하면 삭제 처리가 되고, false로 설정 후 JSON 형태로 요청하면 복구가 됩니다.
