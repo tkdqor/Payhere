@@ -74,7 +74,7 @@ class RestaurantDetailAPIView(APIView):
         """
 
         try:
-            object = Restaurant.objects.get(id=obj_id)
+            object = Restaurant.objects.get(id=obj_id, is_deleted=False)
         except Restaurant.DoesNotExist:
             return None
 
@@ -119,7 +119,7 @@ class RestaurantRecordAPIView(APIView):
         """
 
         try:
-            object = Restaurant.objects.get(id=obj_id)
+            object = Restaurant.objects.get(id=obj_id, is_deleted=False)
         except Restaurant.DoesNotExist:
             return None
 
@@ -165,14 +165,15 @@ class RestaurantRecordAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# url : GET api/v1/restaurants/<restaurant_id>/records/<record_id>
+# url : GET,PUT api/v1/restaurants/<restaurant_id>/records/<record_id>
 class RestaurantRecordDetailAPIView(APIView):
     """
     Assignee : 상백
 
     permission = 작성자 본인만 가능 - GET 메소드 내부에 예외처리로 진행
-    Http method = GET
-    GET : 특정 가계부에 속하는 특정 단일 레코드 조회
+    Http method = GET, PUT
+    GET : 특정 가계부에 속하는 특정 레코드 조회
+    PUT : 특정 가계부에 속하는 특정 레코드 수정
     """
 
     permission_classes = [IsOwner]
@@ -181,15 +182,43 @@ class RestaurantRecordDetailAPIView(APIView):
         """
         Assignee : 상백
 
-        특정 가계부에 속하는 특정 레코드를 조회를 하기 위한 메서드입니다.
+        특정 가계부에 속하는 특정 레코드를 조회하기 위한 메서드입니다.
         가계부 목록 조회에서 볼 수 있는 가계부 고유번호와 특정 가계부에 속하는 레코드 조회에서 볼 수 있는 레코드_고유번호가 필요합니다.
         restaurant_id로 존재하는 객체 또는 record_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
         """
 
         try:
-            restaurant = Restaurant.objects.get(user=request.user, id=restaurant_id)
-            restaurant_record = RestaurantRecord.objects.get(restaurant=restaurant, id=record_id)
+            restaurant = Restaurant.objects.get(user=request.user, id=restaurant_id, is_deleted=False)
+            restaurant_record = RestaurantRecord.objects.get(restaurant=restaurant, id=record_id, is_deleted=False)
             return Response(RestaurantRecordModelSerializer(restaurant_record).data, status=status.HTTP_200_OK)
+        except Restaurant.DoesNotExist:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        except RestaurantRecord.DoesNotExist:
+            return Response({"error": "해당 record_id로 존재하는 레코드가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND)
+
+    def put(self, request, restaurant_id, record_id):
+        """
+        Assignee : 상백
+
+        특정 가계부에 속하는 특정 레코드를 수정하기 위한 메서드입니다.
+        가계부 목록 조회에서 볼 수 있는 가계부 고유번호와 특정 가계부에 속하는 레코드 조회에서 볼 수 있는 레코드_고유번호가 필요합니다.
+        restaurant_id로 존재하는 객체 또는 record_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
+        또한, is_deleted나 date 정보를 수정하려고 해도 에러 메시지를 응답합니다.
+        ex) {"amount": "20000","memo": "카드매출"}
+        """
+
+        if request.data.get("is_deleted", None) or request.data.get("date", None) is not None:
+            return Response({"error": "변경할 수 없는 정보입니다. amount와 memo만 수정이 가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            restaurant = Restaurant.objects.get(user=request.user, id=restaurant_id, is_deleted=False)
+            restaurant_record = RestaurantRecord.objects.get(restaurant=restaurant, id=record_id, is_deleted=False)
+            serializer = RestaurantRecordModelSerializer(restaurant_record, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response({"message": "해당 레코드 정보가 수정되었습니다."}, status=status.HTTP_200_OK)
         except Restaurant.DoesNotExist:
             return Response(
                 {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
