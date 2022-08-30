@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.serializers import (
+    RestaurantRecordTrashSerializer,
     RestaurantTrashSerializer,
     SignInSerializer,
     SignUpSerializer,
     UserTokenObtainPairSerializer,
 )
 from config.permissions import IsOwner
+from restaurant.models import Restaurant
 
 
 # url : POST api/v1/users/signup
@@ -74,7 +76,7 @@ class SignInView(APIView):
         return res
 
 
-# url : GET api/v1/restaurants/trash
+# url : GET api/v1/users/restaurants/trash
 class RestaurantTrashView(APIView):
     """
     Assignee : 상백
@@ -98,3 +100,46 @@ class RestaurantTrashView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response({"error": "해당 유저가 삭제한 가계부가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+
+# url : GET api/v1/users/restaurants/<restaurant_id>/trash
+class RestaurantRecordTrashView(APIView):
+    """
+    Assignee : 상백
+
+    로그인된 유저의 특정 가계부 레코드 삭제 목록을 응답해주는 APIView입니다.
+    """
+
+    permission_classes = [IsOwner]
+
+    def get_object_and_check_permission(self, obj_id):
+        """
+        Assignee : 상백
+
+        restaurant_id로 들어온 id에 해당하는 객체가 있는지 검토하는 메서드입니다.
+        존재하지 않아 DoesNotExist 에러가 발생할 경우 None을 리턴합니다.
+        """
+
+        try:
+            object = Restaurant.objects.get(id=obj_id, is_deleted=False)
+        except Restaurant.DoesNotExist:
+            return None
+
+        self.check_object_permissions(self.request, object)
+        return object
+
+    def get(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        특정 가계부의 삭제된 레코드 목록을 response하는 메서드입니다. 가계부 목록 조회에서 볼 수 있는 가계부 고유번호가 필요합니다.
+        가계부에 속해있는 레코드들을 로그인된 유저가 삭제처리를 진행하여 is_deleted가 True인 가계부 레코드 목록만 보여줍니다.
+        삭제된 레코드가 없다면 JSON 데이터가 비어있게 됩니다.
+        """
+
+        restaurant = self.get_object_and_check_permission(restaurant_id)
+        if not restaurant:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(RestaurantRecordTrashSerializer(restaurant).data, status=status.HTTP_200_OK)

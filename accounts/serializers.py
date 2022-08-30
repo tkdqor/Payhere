@@ -3,6 +3,7 @@ from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 from restaurant.models import Restaurant
+from restaurant.serializers import RestaurantRecordModelSerializer
 
 User = get_user_model()
 
@@ -68,3 +69,23 @@ class RestaurantTrashSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
         fields = ("가계부_고유번호", "name", "is_deleted")
+
+
+class RestaurantRecordTrashSerializer(serializers.ModelSerializer):
+    """
+    Assignee : 상백
+
+    유저의 특정 가계부에 속해있는 레코드 삭제 목록을 응답하기 위한 시리얼라이저입니다.
+    레코드와 관련된 정보 및 삭제여부를 보여줍니다.
+    """
+
+    restaurant_records = serializers.SerializerMethodField(required=False, read_only=True)
+
+    def get_restaurant_records(self, obj):
+        restaurant_records = obj.restaurant_record.order_by("-created_at").filter(is_deleted=True)
+        restaurant_records_serializer = RestaurantRecordModelSerializer(restaurant_records, many=True)
+        return restaurant_records_serializer.data
+
+    class Meta:
+        model = Restaurant
+        fields = ("name", "user", "restaurant_records")
