@@ -14,7 +14,6 @@ class RestaurantModelSerializer(ModelSerializer):
     """
 
     가계부_고유번호 = serializers.IntegerField(source="id", required=False, read_only=True)
-    initial_balance = serializers.IntegerField(source="balance", required=False, read_only=True)
     current_balance = serializers.SerializerMethodField(required=False, read_only=True)
 
     def get_current_balance(self, obj):
@@ -36,7 +35,7 @@ class RestaurantModelSerializer(ModelSerializer):
             "name",
             "가계부_고유번호",
             "user",
-            "initial_balance",
+            "balance",
             "current_balance",
             "is_deleted",
             "created_at",

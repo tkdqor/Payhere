@@ -53,14 +53,15 @@ class RestaurantAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# url : GET api/v1/restaurants/<restaurant_id>
+# url : GET,PUT api/v1/restaurants/<restaurant_id>
 class RestaurantDetailAPIView(APIView):
     """
     Assignee : 상백
 
     permission = 작성자 본인만 가능
-    Http method = GET
+    Http method = GET, PUT
     GET : 특정 가계부 조회
+    PUT : 특정 가계부 수정
     """
 
     permission_classes = [IsOwner]
@@ -95,6 +96,29 @@ class RestaurantDetailAPIView(APIView):
                 {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
             )
         return Response(RestaurantModelSerializer(restaurant).data, status=status.HTTP_200_OK)
+
+    def put(self, request, restaurant_id):
+        """
+        Assignee : 상백
+
+        특정 가계부를 수정하기 위한 메서드입니다. 가계부 목록 조회에서 볼 수 있는 가계부 고유번호가 필요합니다.
+        restaurant_id로 존재하는 객체가 없다면 에러 메시지를 응답합니다.
+        is_deleted 정보를 수정하려는 경우에도 에러 메시지를 응답합니다.
+        ex) {"name": "이디야커피 발산점","balance": "500000"}
+        """
+
+        if request.data.get("is_deleted", None) is not None:
+            return Response({"error": "변경할 수 없는 정보입니다. name와 balance만 수정이 가능합니다."}, status=status.HTTP_400_BAD_REQUEST)
+
+        restaurant = self.get_object_and_check_permission(restaurant_id)
+        if not restaurant:
+            return Response(
+                {"error": "해당 restaurant_id로 존재하는 가계부가 없으니 다시 한 번 확인해주세요!"}, status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = RestaurantModelSerializer(restaurant, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"message": "해당 가계부 정보가 수정되었습니다."}, status=status.HTTP_200_OK)
 
 
 # url : GET, POST api/v1/restaurants/<restaurant_id>/records
