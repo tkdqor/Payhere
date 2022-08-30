@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+from restaurant.models import Restaurant
+
 User = get_user_model()
 
 
@@ -51,3 +53,18 @@ class SignInSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("email", "password")
+
+
+class RestaurantTrashSerializer(serializers.ModelSerializer):
+    """
+    Assignee : 상백
+
+    유저의 가계부 삭제 목록을 응답하기 위한 시리얼라이저입니다.
+    가계부의 가계부 고유번호와 이름, 삭제여부를 보여줍니다.
+    """
+
+    가계부_고유번호 = serializers.IntegerField(source="id", required=False, read_only=True)
+
+    class Meta:
+        model = Restaurant
+        fields = ("가계부_고유번호", "name", "is_deleted")
