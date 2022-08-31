@@ -13,7 +13,6 @@ djangorestframework = "*"
 djangorestframework-simplejwt = "*"
 pytest = "*"
 pytest-django = "*"
-mysqlclient = "*"
 pymysql = "*"
 
 [dev-packages]
