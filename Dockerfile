@@ -13,8 +13,9 @@ WORKDIR /srv/docker-server
 COPY ./Pipfile /srv/docker-server/Pipfile
 COPY ./Pipfile.lock /srv/docker-server/Pipfile.lock
 
-RUN pip install pipenv
-RUN pipenv install
+RUN pip install pipenv \
+    && pip install --upgrade pip \
+    && pipenv install --verbose --deploy --ignore-pipfile
 RUN pipenv install uwsgi
 
 EXPOSE 8000
