@@ -123,7 +123,11 @@
 <br>
 
 ## 📋 ERD
+<img width="776" alt="image" src="https://user-images.githubusercontent.com/95380638/187832719-1d878354-ab1e-47be-98f9-dea9194cd108.png">
 
+- **User 모델과 Restaurant 모델은 1:N 관계로 설정했습니다. 1명의 유저(사용자)는 여러 개의 식당 또는 가게의 가계부를 생성할 수 있습니다.**
+- **Restaurant 모델과 RestaurantRecord 모델은 1:N 관계로 설정했습니다. 1개의 식당은 금액과 메모가 담긴 여러 개의 레코드를 가질 수 있습니다.**
+- **삭제는 BooleanField로 완전히 데이터를 삭제하지 않고 True, False로 구분지었습니다.**
 
 <br>
 
