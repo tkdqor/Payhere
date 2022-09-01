@@ -196,4 +196,20 @@ class RestaurantAPIView(APIView):
 
 <br>
 
+## ✔️ Test Case
+- accounts 앱 : 회원가입 및 회원 로그인 테스트 진행 완료
+- restaurant 앱 : 특정 가계부 조회 확인, 특정 가계부에 속한 특정 레코드 조회 확인, 특정 가계부에 속한 레코드 조회 확인 테스트 진행 완료
 
+<br>
+
+## 🌎 배포
+- **배포 완료 실패**
+
+- **배포 진행상황**
+  - **AWS RDS로 Mysql 5.7버전을 선택하여 데이터베이스 서버 생성 완료**
+  - **AWS EC2를 생성하여 해당 EC2와 RDS 연결 완료**
+  - **루트 디렉터리 내부에 Dockerfile를 생성하여 django 앱 서버에 관련된 도커 이미지를 EC2에서 생성하는 과정에서 오류 발생**
+    - 1) mysqlclient가 로컬 환경에서도 mysql 설치 과정에서 오류가 발생했기에 해당 문제라고 판단, 로컬 환경에서 pipenv uninstall mysqlclient를 입력하고 다시 진행 - 실패
+    - 2) 로컬 환경의 python 버전이 3.9인데 Dockerfile에서는 3.8로 설정되어 있는 것을 확인하여 FROM python:3.9로 수정 후 다시 진행 - 실패
+    - 3) [해당 문서](https://pipenv.pypa.io/_/downloads/en/latest/pdf/)를 찾던 과정에서 pipenv install --deploy 해당 명령어를 찾고 수정 후 다시 진행. 이미지 생성 과정에서 터미널에 어떤 오류도 뜨지 않고 대기 상태가 지속되었기에, 해당 명령어로 Pipfile와 Pipfile.lock 빌드 과정에서 문제가 있다면 빌드에 실패하여 오류가 발생할 수 있도록 하기 위함. - 실패
+    - 4) [해당 글](https://github.com/pypa/pipenv/issues/4266)을 참고해서 pipenv install --verbose --deploy --ignore-pipfile 해당 명령어를 찾고 수정 후 다시 진행. pipfile이 문제가 된다면 일단 해당 파일 빌드를 무시하고 진행하려고 했음. - 실패
