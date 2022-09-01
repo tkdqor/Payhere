@@ -17,7 +17,7 @@
 ![DRFsimpleJWT badge](https://img.shields.io/badge/DRFsimpleJWT-%23092E20?&logo=DRF&logoColor=white)
 
 - DB<br>
-![Mysql badge](https://img.shields.io/badge/Mysql-%23092E20?&logo=Mysql&logoColor=white)
+![Mysql badge](https://img.shields.io/badge/Mysql-5.7-%23092E20?&logo=Mysql&logoColor=white)
 
 - ETC<br>
   <img src="https://img.shields.io/badge/Git-F05032?style=flat&logo=Git&logoColor=white"/>
@@ -46,7 +46,79 @@
 <br>
 
 ## 🌟 API 명세서
+<img width="1141" alt="image" src="https://user-images.githubusercontent.com/95380638/187829237-00fe4516-b9db-4b30-828b-8747aaa2c68c.png">
 
+<details>
+<summary>🚀 API 호출 테스트 결과</summary>
+<div markdown="1">
+<ul>
+  <li>
+    <p>회원가입</p>
+    <img width="857" alt="image" src="https://user-images.githubusercontent.com/95380638/187829439-b68340fa-a860-4e47-ad51-365c778fec14.png">
+  </li>
+  <li>
+    <p>로그인</p>
+    <img width="858" alt="image" src="https://user-images.githubusercontent.com/95380638/187829492-7512db15-6284-4181-9e55-8779b8700d78.png">
+  </li>
+  <li>
+    <p>access token 및 refresh token 재발급</p>
+    <img width="834" alt="image" src="https://user-images.githubusercontent.com/95380638/187829569-20f9c454-c1a0-4d1d-83b5-0a78f29725d0.png">
+  </li>
+  <li>
+    <p>삭제한 가계부 목록 확인</p>
+    <img width="846" alt="image" src="https://user-images.githubusercontent.com/95380638/187829691-60f5361a-cccc-457d-8137-b300cf68a9e7.png">
+  </li>
+  <li>
+    <p>특정 가계부의 삭제한 레코드 목록 확인</p>
+    <img width="866" alt="image" src="https://user-images.githubusercontent.com/95380638/187829806-7461cec0-ac0f-48b1-8cb0-eab45184cd5a.png">
+  </li>
+  <li>
+    <p>가계부 생성</p>
+    <img width="845" alt="image" src="https://user-images.githubusercontent.com/95380638/187829892-64416941-f1e4-4f95-be0f-5105c3c46c61.png">
+  </li>
+  <li>
+    <p>가계부 목록 조회</p>
+    <img width="858" alt="image" src="https://user-images.githubusercontent.com/95380638/187829943-b1710a76-f455-4e27-8d26-872f4f971041.png">
+  </li>
+  <li>
+    <p>특정 가계부 조회</p>
+    <img width="850" alt="image" src="https://user-images.githubusercontent.com/95380638/187830002-841a740a-1092-49e4-a580-2551b4b07e75.png">
+  </li>
+  <li>
+    <p>특정 가계부 수정</p>
+    <img width="856" alt="image" src="https://user-images.githubusercontent.com/95380638/187830094-bf6c3b30-20a7-4f32-a003-f16c107fd7ef.png">
+  </li>
+  <li>
+    <p>특정 가계부 삭제 및 복구</p>
+    <img width="855" alt="image" src="https://user-images.githubusercontent.com/95380638/187830168-446d675e-e8db-4c20-8f38-bbb67cd9ce6b.png">
+    <img width="854" alt="image" src="https://user-images.githubusercontent.com/95380638/187830695-dd94e775-717d-4a81-8a75-25fa6500b9ac.png">
+  </li>
+  <li>
+    <p>특정 가계부에 속하는 레코드 생성</p>
+    <img width="843" alt="image" src="https://user-images.githubusercontent.com/95380638/187830233-2b08a010-a17e-47b8-83ce-00675cf8699c.png">
+  </li>
+  <li>
+    <p>특정 가계부에 속하는 레코드 목록 조회</p>
+    <img width="871" alt="image" src="https://user-images.githubusercontent.com/95380638/187830399-65997557-0640-447b-a815-480c4f50af40.png">
+    <img width="860" alt="image" src="https://user-images.githubusercontent.com/95380638/187830422-b191c3bb-6f4c-4f69-869c-b4c8f9dd6a10.png">
+  </li>
+  <li>
+    <p>특정 가계부에 속하는 단일 레코드 조회</p>
+    <img width="841" alt="image" src="https://user-images.githubusercontent.com/95380638/187830513-2932f9d6-ae20-4196-b0a9-99ff343c53b1.png">
+  </li>
+  <li>
+    <p>특정 가계부에 속하는 단일 레코드 수정</p>
+    <img width="856" alt="image" src="https://user-images.githubusercontent.com/95380638/187830562-78e5f4d3-d9e2-4feb-af4d-9c8888d29c0a.png">
+  </li>
+  <li>
+    <p>특정 가계부에 속하는 단일 레코드 삭제 및 복구</p>
+    <img width="860" alt="image" src="https://user-images.githubusercontent.com/95380638/187830627-ed5c03b0-a3b2-458a-9110-78ae8600c94f.png">
+    <img width="853" alt="image" src="https://user-images.githubusercontent.com/95380638/187830651-4e85d2de-49d5-4893-a027-f61234cca70c.png">
+  </li>
+
+</ul>
+</div>
+</details>
 
 <br>
 
