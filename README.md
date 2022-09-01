@@ -48,6 +48,11 @@
 ## 🌟 API 명세서
 <img width="1141" alt="image" src="https://user-images.githubusercontent.com/95380638/187829237-00fe4516-b9db-4b30-828b-8747aaa2c68c.png">
 
+- **/api/v1/token/refresh** : 해당 API로 access token 및 refresh token 재발급할 수 있게 설정. settings.py에서 SIMPLE_JWT의 설정 중, ROTATE_REFRESH_TOKENS이라는 항목을 True로 설정하여 재발급 시, access token만 갱신되는 것이 아니라 refresh token도 같이 갱신되도록 진행.
+- **/api/v1/users/restaurants/trash** : 해당 API로 로그인된 유저가 삭제한 가계부를 확인할 수 있도록 진행. 일반적인 휴지통과 같이 유저 본인이 확인한다는 개념으로 accounts 앱 View에 구성. 특정 가계부의 삭제한 레코드 목록 확인 API도 같은 맥락으로 설정.
+- **/api/v1/restaurants/<restaurant_id>** : 해당 API로 특정 가계부 삭제 및 복구를 진행. is_deleted 필드를 true로 설정하고 요청하면 삭제가 되고 false로 설정하면 복구가 진행되도록 설정. PATCH의 경우, 멱등성이 보장되는 경우도 있고 아닌 경우도 있기에 따로 2개의 API URL를 구성할 필요가 없다고 판단. 특정 가계부에 속하는 단일 레코드 삭제 및 복구 API도 같은 맥락으로 설정.
+
+
 <details>
 <summary>🚀 API 호출 테스트 결과</summary>
 <div markdown="1">
