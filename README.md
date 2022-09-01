@@ -213,6 +213,8 @@ class RestaurantAPIView(APIView):
 - **배포 진행상황**
   - **AWS RDS로 Mysql 5.7버전을 선택하여 데이터베이스 서버 생성 완료**
   - **AWS EC2를 생성하여 해당 EC2와 RDS 연결 완료**
+  <img width="1433" alt="image" src="https://user-images.githubusercontent.com/95380638/187838122-899df97b-0106-4a18-871b-61c6d6af06a9.png">
+  
   - **루트 디렉터리 내부에 Dockerfile를 생성하여 django 앱 서버에 관련된 도커 이미지를 EC2에서 생성하는 과정에서 오류 발생**
     - 1) mysqlclient가 로컬 환경에서도 mysql 설치 과정에서 오류가 발생했기에 해당 문제라고 판단, 로컬 환경에서 pipenv uninstall mysqlclient를 입력하고 다시 진행 - 실패
     - 2) 로컬 환경의 python 버전이 3.9인데 Dockerfile에서는 3.8로 설정되어 있는 것을 확인하여 FROM python:3.9로 수정 후 다시 진행 - 실패
